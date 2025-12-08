@@ -1,0 +1,7 @@
+{
+  "notifications": "https://functions.poehali.dev/dc7bc38a-fb4b-4c3c-be7e-d9b8cb0a48f2",
+  "auth": "https://functions.poehali.dev/0361ad2c-e0b4-4a43-9a5e-064e74824ed1",
+  "wallets": "https://functions.poehali.dev/86bcee4a-dd62-495e-a557-c1c91198e7e4",
+  "rates": "https://functions.poehali.dev/68afa9d4-8dbf-4c81-960b-4a45c9e2cf92",
+  "exchange": "https://functions.poehali.dev/3c872717-fdf0-4fb6-9d0c-2a3ab44b22bf"
+}

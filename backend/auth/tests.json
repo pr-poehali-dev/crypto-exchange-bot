@@ -1,0 +1,33 @@
+{
+  "tests": [
+    {
+      "name": "Register new user",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "telegram_id": 123456789,
+        "username": "testuser",
+        "first_name": "Test"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "telegram_id": 123456789,
+        "referral_code": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Login existing user",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "telegram_id": 123456789
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "telegram_id": 123456789
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

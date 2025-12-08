@@ -1,0 +1,29 @@
+{
+  "tests": [
+    {
+      "name": "Get user notifications",
+      "method": "GET",
+      "path": "/?telegram_id=123456789",
+      "expectedStatus": 200,
+      "expectedBody": [],
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Create notification",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "telegram_id": 123456789,
+        "type": "info",
+        "title": "Test notification",
+        "message": "This is a test"
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "type": "info",
+        "title": "Test notification"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}
