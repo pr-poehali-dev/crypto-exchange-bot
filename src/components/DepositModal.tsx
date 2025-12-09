@@ -38,6 +38,7 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
         payload: 'user_123'
       });
       
+      console.log('Invoice response:', result);
       setInvoice(result);
     } catch (error) {
       console.error('Ошибка создания счета:', error);
@@ -139,20 +140,31 @@ export function DepositModal({ isOpen, onClose }: DepositModalProps) {
 
             <Card className="bg-white/5 border-white/10 p-4">
               <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">ID счета:</span>
-                  <span className="text-white font-mono">{invoice.invoice_id}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Статус:</span>
-                  <span className="text-white">{invoice.status}</span>
-                </div>
+                {invoice.invoice_id && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">ID счета:</span>
+                    <span className="text-white font-mono text-xs">{invoice.invoice_id}</span>
+                  </div>
+                )}
+                {invoice.status && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Статус:</span>
+                    <span className="text-white capitalize">{invoice.status}</span>
+                  </div>
+                )}
+                {invoice.amount && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-400">Сумма:</span>
+                    <span className="text-white">{invoice.amount} {invoice.asset}</span>
+                  </div>
+                )}
               </div>
             </Card>
 
             <Button
               className="w-full gradient-primary border-0 text-white h-12 text-lg font-semibold"
               onClick={handlePayment}
+              disabled={!invoice.pay_url}
             >
               <Icon name="ExternalLink" size={20} className="mr-2" />
               Перейти к оплате
