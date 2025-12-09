@@ -129,6 +129,37 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 conn.commit()
                 
+                # Отправляем уведомление в Telegram
+                try:
+                    import urllib.request
+                    bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+                    if bot_token:
+                        amount_text = f"{float(amount):.8f}" if asset in ['BTC', 'ETH', 'LTC'] else f"{float(amount):.2f}"
+                        message_text = f"""
+💰 <b>Платеж получен!</b>
+
+Сумма: <code>{amount_text} {asset}</code>
+Статус: ✅ Оплачен
+
+Ваш баланс обновлен.
+"""
+                        
+                        url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+                        data = json.dumps({
+                            'chat_id': telegram_id,
+                            'text': message_text,
+                            'parse_mode': 'HTML'
+                        }).encode('utf-8')
+                        
+                        req = urllib.request.Request(
+                            url,
+                            data=data,
+                            headers={'Content-Type': 'application/json'}
+                        )
+                        urllib.request.urlopen(req, timeout=5)
+                except Exception as e:
+                    print(f"Failed to send telegram notification: {e}")
+                
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
