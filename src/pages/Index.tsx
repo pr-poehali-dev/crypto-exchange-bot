@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { HomeTab } from '@/components/HomeTab';
 import { ExchangeTab } from '@/components/ExchangeTab';
 import { WalletsProfileTab } from '@/components/WalletsProfileTab';
 import { AdminTab } from '@/components/AdminTab';
 import { BottomNavigation } from '@/components/BottomNavigation';
+import { telegramAuth, TelegramUser } from '@/utils/telegram';
 
 type TabType = 'home' | 'exchange' | 'wallets' | 'profile' | 'history' | 'support' | 'admin';
 
@@ -43,6 +45,18 @@ export default function Index() {
   const [exchangeTo, setExchangeTo] = useState('BTC');
   const [exchangeAmount, setExchangeAmount] = useState('');
   const [isAdmin] = useState(true);
+  const [telegramUser, setTelegramUser] = useState<TelegramUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const user = telegramAuth.getUser();
+    if (user) {
+      setTelegramUser(user);
+      telegramAuth.setHeaderColor('bg_color');
+      telegramAuth.setBackgroundColor('#1A1F2C');
+    }
+    setIsLoading(false);
+  }, []);
 
   const calculateExchange = () => {
     if (!exchangeAmount) return '0.00';
@@ -51,6 +65,45 @@ export default function Index() {
     return (amount / rate).toFixed(8);
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#1A1F2C] via-[#1e1533] to-[#1A1F2C] flex items-center justify-center">
+        <div className="text-white text-center">
+          <Icon name="Loader2" className="animate-spin mx-auto mb-4" size={40} />
+          <p>Загрузка...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!telegramUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#1A1F2C] via-[#1e1533] to-[#1A1F2C] flex items-center justify-center p-4">
+        <Card className="max-w-md w-full">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Icon name="ShieldAlert" className="text-yellow-600" />
+              Требуется Telegram
+            </CardTitle>
+            <CardDescription>
+              Это приложение работает только внутри Telegram
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Пожалуйста, откройте приложение через вашего Telegram бота:
+            </p>
+            <ol className="list-decimal list-inside space-y-2 text-sm">
+              <li>Откройте своего бота в Telegram</li>
+              <li>Отправьте команду /start</li>
+              <li>Нажмите кнопку "Открыть приложение"</li>
+            </ol>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1A1F2C] via-[#1e1533] to-[#1A1F2C]">
       <div className="max-w-md mx-auto pb-20">
@@ -58,7 +111,9 @@ export default function Index() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-2xl font-bold text-white mb-1">Crypto Exchange</h1>
-              <p className="text-sm text-gray-400">Быстрый обмен криптовалюты</p>
+              <p className="text-sm text-gray-400">
+                Привет, {telegramUser.first_name}!
+              </p>
             </div>
             <Button size="icon" variant="ghost" className="text-white">
               <Icon name="Bell" size={22} />

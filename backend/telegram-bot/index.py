@@ -95,17 +95,41 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 welcome_text = f"""
 🚀 <b>Добро пожаловать в Crypto Exchange!</b>
 
-Я буду присылать вам уведомления о:
+Откройте приложение через кнопку ниже 👇
+
+Я буду присылать уведомления о:
 • 💰 Новых платежах
 • 💱 Успешных обменах
 • 📊 Изменениях курсов валют
-
-Ваш Telegram ID: <code>{telegram_user['id']}</code>
-
-Используйте этот ID для входа в приложение.
 """
                 
-                send_message(chat_id, welcome_text)
+                # Отправляем сообщение с кнопкой Web App
+                url = f'{BASE_URL}/sendMessage'
+                webapp_url = os.environ.get('WEB_APP_URL', 'https://crypto.poehali.dev')
+                data = {
+                    'chat_id': chat_id,
+                    'text': welcome_text,
+                    'parse_mode': 'HTML',
+                    'reply_markup': {
+                        'inline_keyboard': [[
+                            {
+                                'text': '🚀 Открыть приложение',
+                                'web_app': {'url': webapp_url}
+                            }
+                        ]]
+                    }
+                }
+                
+                req = urllib.request.Request(
+                    url,
+                    data=json.dumps(data).encode('utf-8'),
+                    headers={'Content-Type': 'application/json'}
+                )
+                
+                try:
+                    urllib.request.urlopen(req)
+                except Exception as e:
+                    print(f"Error sending web app button: {e}")
             
             elif text == '/wallets':
                 conn = psycopg2.connect(os.environ['DATABASE_URL'])
