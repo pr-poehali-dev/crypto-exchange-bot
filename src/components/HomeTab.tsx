@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { DepositModal } from '@/components/DepositModal';
 
 interface HomeTabProps {
   mockUser: {
@@ -20,8 +22,12 @@ interface HomeTabProps {
 }
 
 export function HomeTab({ mockUser, mockRates }: HomeTabProps) {
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
+
   return (
-    <div className="space-y-6 animate-fade-in">
+    <>
+      <DepositModal isOpen={isDepositOpen} onClose={() => setIsDepositOpen(false)} />
+      <div className="space-y-6 animate-fade-in">
       <Card className="glass-card border-0 p-6 animate-scale-in">
         <div className="flex items-center justify-between mb-4">
           <span className="text-gray-400 text-sm">Общий баланс</span>
@@ -44,7 +50,11 @@ export function HomeTab({ mockUser, mockRates }: HomeTabProps) {
             <Icon name="ArrowDownUp" size={20} className="mb-1" />
             <span className="text-xs">Обмен</span>
           </Button>
-          <Button variant="outline" className="glass-card border-white/10 text-white flex flex-col h-auto py-3 hover:bg-white/10 transition-colors">
+          <Button 
+            variant="outline" 
+            className="glass-card border-white/10 text-white flex flex-col h-auto py-3 hover:bg-white/10 transition-colors"
+            onClick={() => setIsDepositOpen(true)}
+          >
             <Icon name="ArrowDownToLine" size={20} className="mb-1" />
             <span className="text-xs">Пополнить</span>
           </Button>
@@ -103,6 +113,7 @@ export function HomeTab({ mockUser, mockRates }: HomeTabProps) {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 }

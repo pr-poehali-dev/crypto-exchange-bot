@@ -5,7 +5,8 @@ const API_URLS = {
   wallets: funcUrls.wallets,
   notifications: funcUrls.notifications,
   exchange: funcUrls.exchange,
-  rates: funcUrls.rates
+  rates: funcUrls.rates,
+  cryptoBot: funcUrls['crypto-bot']
 };
 
 export interface User {
@@ -70,6 +71,27 @@ export interface ExchangeRate {
   updated_at: string;
 }
 
+export interface CryptoInvoice {
+  invoice_id: string;
+  status: string;
+  hash?: string;
+  asset: string;
+  amount: string;
+  pay_url: string;
+  description?: string;
+  created_at: string;
+  paid_at?: string;
+}
+
+export interface CryptoCurrency {
+  is_blockchain: boolean;
+  is_stablecoin: boolean;
+  is_fiat: boolean;
+  name: string;
+  code: string;
+  decimals: number;
+}
+
 export const api = {
   auth: {
     register: async (data: {
@@ -84,6 +106,50 @@ export const api = {
         body: JSON.stringify(data)
       });
       return response.json();
+    }
+  },
+
+  cryptoBot: {
+    getMe: async (): Promise<any> => {
+      const response = await fetch(`${API_URLS.cryptoBot}?action=getMe`);
+      return response.json();
+    },
+
+    getCurrencies: async (): Promise<CryptoCurrency[]> => {
+      const response = await fetch(`${API_URLS.cryptoBot}?action=getCurrencies`);
+      const data = await response.json();
+      return data.result || [];
+    },
+
+    getBalance: async (): Promise<any> => {
+      const response = await fetch(`${API_URLS.cryptoBot}?action=getBalance`);
+      return response.json();
+    },
+
+    getExchangeRates: async (): Promise<any> => {
+      const response = await fetch(`${API_URLS.cryptoBot}?action=getExchangeRates`);
+      return response.json();
+    },
+
+    createInvoice: async (data: {
+      asset: string;
+      amount: number;
+      description?: string;
+      payload?: string;
+    }): Promise<CryptoInvoice> => {
+      const response = await fetch(API_URLS.cryptoBot, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const result = await response.json();
+      return result.result || result;
+    },
+
+    getInvoice: async (invoiceId: string): Promise<CryptoInvoice> => {
+      const response = await fetch(`${API_URLS.cryptoBot}?action=getInvoice&invoice_id=${invoiceId}`);
+      const result = await response.json();
+      return result.result?.items?.[0] || result;
     }
   },
 
