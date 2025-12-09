@@ -12,6 +12,8 @@ from urllib.error import HTTPError
 API_TOKEN = os.environ.get('CRYPTO_BOT_API_TOKEN', '')
 BASE_URL = 'https://pay.crypt.bot/api'
 
+# Force redeploy v2
+
 def make_request(method: str, endpoint: str, data: Dict = None) -> Dict:
     """Выполняет запрос к Crypto Bot API"""
     url = f"{BASE_URL}/{endpoint}"
@@ -39,6 +41,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     Returns: HTTP response dict
     '''
     method: str = event.get('httpMethod', 'GET')
+    
+    # Debug: check if token is available
+    token_status = 'present' if API_TOKEN and len(API_TOKEN) > 10 else 'missing'
+    print(f"[DEBUG] API_TOKEN status: {token_status}, length: {len(API_TOKEN) if API_TOKEN else 0}")
     
     # CORS OPTIONS
     if method == 'OPTIONS':

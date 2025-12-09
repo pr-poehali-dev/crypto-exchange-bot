@@ -1,4 +1,5 @@
 {
+  "crypto-bot-test": "https://functions.poehali.dev/4c537cc4-5b75-4c13-96a4-889c1a90772e",
   "crypto-webhook": "https://functions.poehali.dev/da9602d2-ce86-4372-bbb4-5d1d7babe8ce",
   "crypto-bot": "https://functions.poehali.dev/adee272e-5b6a-4a6a-a6d2-a599136ab133",
   "notifications": "https://functions.poehali.dev/dc7bc38a-fb4b-4c3c-be7e-d9b8cb0a48f2",
