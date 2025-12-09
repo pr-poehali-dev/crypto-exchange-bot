@@ -15,7 +15,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, PUT, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type, X-Telegram-User-Id',
                 'Access-Control-Max-Age': '86400'
             },
@@ -27,6 +27,28 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur = conn.cursor(cursor_factory=RealDictCursor)
     
     if method == 'GET':
+        params = event.get('queryStringParameters') or {}
+        action = params.get('action')
+        
+        if action == 'list':
+            cur.execute(
+                """
+                SELECT * FROM exchange_rates
+                ORDER BY from_currency, to_currency
+                """
+            )
+            rates = cur.fetchall()
+            
+            cur.close()
+            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'rates': [dict(r) for r in rates]}, default=str),
+                'isBase64Encoded': False
+            }
+        
         cur.execute(
             """
             SELECT * FROM exchange_rates
@@ -43,6 +65,79 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps([dict(r) for r in rates], default=str),
+            'isBase64Encoded': False
+        }
+    
+    if method == 'POST':
+        body_data = json.loads(event.get('body', '{}'))
+        action = body_data.get('action')
+        
+        if action == 'update':
+            rate_id = body_data.get('rate_id')
+            base_rate = body_data.get('base_rate')
+            markup_percent = body_data.get('markup_percent')
+            is_active = body_data.get('is_active')
+            
+            updates = []
+            values = []
+            
+            if base_rate is not None:
+                updates.append('base_rate = %s')
+                values.append(base_rate)
+            
+            if markup_percent is not None:
+                updates.append('markup_percent = %s')
+                values.append(markup_percent)
+            
+            if is_active is not None:
+                updates.append('is_active = %s')
+                values.append(is_active)
+            
+            if not updates:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'No fields to update'}),
+                    'isBase64Encoded': False
+                }
+            
+            values.append(rate_id)
+            
+            cur.execute(
+                f"""
+                UPDATE exchange_rates
+                SET {', '.join(updates)}, updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+                RETURNING *
+                """,
+                tuple(values)
+            )
+            
+            updated_rate = cur.fetchone()
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            
+            if not updated_rate:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Rate not found'}),
+                    'isBase64Encoded': False
+                }
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'success': True, 'rate': dict(updated_rate)}, default=str),
+                'isBase64Encoded': False
+            }
+        
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Invalid action'}),
             'isBase64Encoded': False
         }
     
