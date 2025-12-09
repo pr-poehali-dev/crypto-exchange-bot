@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "Check OPTIONS for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Handle webhook without payload",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "update_type": "invoice_paid",
+        "payload": {}
+      },
+      "expectedStatus": 400
+    }
+  ]
+}

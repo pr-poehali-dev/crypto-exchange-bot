@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { DepositModal } from '@/components/DepositModal';
+import { WithdrawModal } from '@/components/WithdrawModal';
 
 interface HomeTabProps {
   mockUser: {
@@ -19,14 +20,17 @@ interface HomeTabProps {
     rate: number;
     change: number;
   }>;
+  onTabChange?: (tab: string) => void;
 }
 
-export function HomeTab({ mockUser, mockRates }: HomeTabProps) {
+export function HomeTab({ mockUser, mockRates, onTabChange }: HomeTabProps) {
   const [isDepositOpen, setIsDepositOpen] = useState(false);
+  const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
 
   return (
     <>
       <DepositModal isOpen={isDepositOpen} onClose={() => setIsDepositOpen(false)} />
+      <WithdrawModal isOpen={isWithdrawOpen} onClose={() => setIsWithdrawOpen(false)} />
       <div className="space-y-6 animate-fade-in">
       <Card className="glass-card border-0 p-6 animate-scale-in">
         <div className="flex items-center justify-between mb-4">
@@ -46,7 +50,10 @@ export function HomeTab({ mockUser, mockRates }: HomeTabProps) {
           </div>
         </div>
         <div className="grid grid-cols-3 gap-3">
-          <Button className="gradient-primary border-0 text-white flex flex-col h-auto py-3 hover:opacity-90 transition-opacity">
+          <Button 
+            className="gradient-primary border-0 text-white flex flex-col h-auto py-3 hover:opacity-90 transition-opacity"
+            onClick={() => onTabChange?.('exchange')}
+          >
             <Icon name="ArrowDownUp" size={20} className="mb-1" />
             <span className="text-xs">Обмен</span>
           </Button>
@@ -58,7 +65,11 @@ export function HomeTab({ mockUser, mockRates }: HomeTabProps) {
             <Icon name="ArrowDownToLine" size={20} className="mb-1" />
             <span className="text-xs">Пополнить</span>
           </Button>
-          <Button variant="outline" className="glass-card border-white/10 text-white flex flex-col h-auto py-3 hover:bg-white/10 transition-colors">
+          <Button 
+            variant="outline" 
+            className="glass-card border-white/10 text-white flex flex-col h-auto py-3 hover:bg-white/10 transition-colors"
+            onClick={() => setIsWithdrawOpen(true)}
+          >
             <Icon name="ArrowUpFromLine" size={20} className="mb-1" />
             <span className="text-xs">Вывести</span>
           </Button>
@@ -101,12 +112,18 @@ export function HomeTab({ mockUser, mockRates }: HomeTabProps) {
       <div>
         <h3 className="text-white font-semibold mb-3">Быстрые действия</h3>
         <div className="grid grid-cols-2 gap-3">
-          <Card className="glass-card border-0 p-4 cursor-pointer hover:bg-white/10 transition-colors">
+          <Card 
+            className="glass-card border-0 p-4 cursor-pointer hover:bg-white/10 transition-colors"
+            onClick={() => onTabChange?.('profile')}
+          >
             <Icon name="Users" size={24} className="text-primary mb-2" />
             <div className="text-white font-medium text-sm">Реферальная программа</div>
             <div className="text-xs text-gray-400 mt-1">Приглашай и зарабатывай</div>
           </Card>
-          <Card className="glass-card border-0 p-4 cursor-pointer hover:bg-white/10 transition-colors">
+          <Card 
+            className="glass-card border-0 p-4 cursor-pointer hover:bg-white/10 transition-colors"
+            onClick={() => onTabChange?.('support')}
+          >
             <Icon name="Headphones" size={24} className="text-accent mb-2" />
             <div className="text-white font-medium text-sm">Поддержка</div>
             <div className="text-xs text-gray-400 mt-1">Помощь 24/7</div>

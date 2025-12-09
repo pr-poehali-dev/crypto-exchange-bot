@@ -68,7 +68,7 @@ export default function Index() {
 
         <main className="px-4">
           {activeTab === 'home' && (
-            <HomeTab mockUser={mockUser} mockRates={mockRates} />
+            <HomeTab mockUser={mockUser} mockRates={mockRates} onTabChange={setActiveTab} />
           )}
 
           {activeTab === 'exchange' && (
@@ -78,6 +78,8 @@ export default function Index() {
               exchangeAmount={exchangeAmount}
               setExchangeAmount={setExchangeAmount}
               calculateExchange={calculateExchange}
+              onExchangeFromChange={setExchangeFrom}
+              onExchangeToChange={setExchangeTo}
             />
           )}
 
